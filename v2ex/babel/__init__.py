@@ -179,6 +179,7 @@ class Topic(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     last_modified = db.DateTimeProperty(auto_now=True)
     last_touched = db.DateTimeProperty()
+    sink = db.IntegerProperty(default=0)
     
 class Reply(db.Model):
     num = db.IntegerProperty(indexed=True)

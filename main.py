@@ -279,7 +279,7 @@ class RecentHandler(webapp.RequestHandler):
         if (latest):
             template_values['latest'] = latest
         else:
-            q2 = db.GqlQuery("SELECT * FROM Topic ORDER BY last_touched DESC LIMIT 16,50")
+            q2 = db.GqlQuery("SELECT * FROM Topic WHERE sink = 0 ORDER BY last_touched DESC LIMIT 16,50")
             topics = []
             IGNORED_RECENT = ['flamewar', 'pointless', 'in', 'autistic', 'chamber', 'flood', 'diary']
             for topic in q2:

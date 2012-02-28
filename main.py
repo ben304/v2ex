@@ -127,7 +127,7 @@ class HomeHandler(webapp.RequestHandler):
                 if (latest):
                     template_values['latest'] = latest
                 else:
-                    q2 = db.GqlQuery("SELECT * FROM Topic ORDER BY last_touched DESC LIMIT 16")
+                    q2 = db.GqlQuery("SELECT * FROM Topic WHERE sink = 0 ORDER BY last_touched DESC LIMIT 16")
                     topics = []
                     for topic in q2:
                         if topic.node_name not in ignored:
@@ -146,7 +146,7 @@ class HomeHandler(webapp.RequestHandler):
                 if (latest):
                     template_values['latest'] = latest
                 else:
-                    q2 = db.GqlQuery("SELECT * FROM Topic ORDER BY last_touched DESC LIMIT 16")
+                    q2 = db.GqlQuery("SELECT * FROM Topic WHERE sink = 0 ORDER BY last_touched DESC LIMIT 16")
                     topics = []
                     for topic in q2:
                         if topic.node_name not in ignored:

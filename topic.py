@@ -410,6 +410,7 @@ class TopicHandler(webapp.RequestHandler):
                 memcache.set('Topic_' + str(topic_num), topic, 86400)
         can_edit = False
         can_move = False
+        can_sink = False
         if topic:
             if topic.content:
                 template_values['page_description'] = topic.content[:60] + ' - ' + topic.member.username
@@ -421,6 +422,7 @@ class TopicHandler(webapp.RequestHandler):
                     can_edit = True
                     can_move = True
                 if topic.member_num == member.num:
+                    can_sink = True
                     now = datetime.datetime.now()
                     if (now - topic.created).seconds < 300:
                         can_edit = True
@@ -443,6 +445,7 @@ class TopicHandler(webapp.RequestHandler):
         template_values['topic'] = topic
         template_values['can_edit'] = can_edit
         template_values['can_move'] = can_move
+        template_values['can_sink'] = can_sink
         if (topic):
             node = False
             section = False
@@ -1082,7 +1085,25 @@ class TopicDeleteHandler(webapp.RequestHandler):
                     memcache.delete('home_rendered')
                     memcache.delete('home_rendered_mobile')
         self.redirect('/')
-                    
+
+class TopicSinkHandler(webapp.RequestHandler):
+    def get(self, topic_num):
+        site = GetSite()
+        member = CheckAuth(self)
+        if member:
+            q = db.GqlQuery("SELECT * FROM Topic WHERE num = :1", int(topic_num))
+            if q.count() == 1:
+                topic = q[0]
+                if member.num == topic.member_num:
+                    topic.sink = 1 if topic.sink == 0 else 0
+                    topic.put()
+                    memcache.delete('Topic_' + str(topic.num))
+                    #useless
+                    memcache.delete('q_latest_16')
+                    memcache.delete('home_rendered')
+                    memcache.delete('home_rendered_mobile')
+        self.redirect('/t/' + str(topic_num))   
+	
 
 class TopicPlainTextHandler(webapp.RequestHandler):
     def get(self, topic_num):
@@ -1235,6 +1256,7 @@ def main():
     ('/t/([0-9]+).txt', TopicPlainTextHandler),
     ('/edit/topic/([0-9]+)', TopicEditHandler),
     ('/delete/topic/([0-9]+)', TopicDeleteHandler),
+	('/sink/topic/([0-9]+)', TopicSinkHandler),
     ('/index/topic/([0-9]+)', TopicIndexHandler),
     ('/edit/reply/([0-9]+)', ReplyEditHandler),
     ('/hit/topic/(.*)', TopicHitHandler),

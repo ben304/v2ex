@@ -50,10 +50,7 @@ def autolink(text, trim_url_limit=None, nofollow=False):
         match = punctuation_re.match(word)
         if match:
             lead, middle, trail = match.groups()
-            if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
-                    len(middle) > 0 and middle[0] in string.letters + string.digits and \
-                    (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                middle = '<a href="http://%s"%s target="_blank">%s</a>' % (middle, nofollow_attr, trim_url(middle))
+            #Let guys without 'http://' go
             if middle.startswith('http://') or middle.startswith('https://'):
                 middle = '<a href="%s"%s target="_blank">%s</a>' % (middle, nofollow_attr, trim_url(middle))
             if '@' in middle and not middle.startswith('www.') and not ':' in middle \
